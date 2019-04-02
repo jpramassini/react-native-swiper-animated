@@ -395,6 +395,9 @@ export default class SwiperAnimated extends PureComponent {
   }
 
   forceLeftSwipe = () => {
+    const { onLeftSwipe } = this.props
+    const { card } = this.state
+    onLeftSwipe(card)
     this.cardAnimation = Animated.timing(this.pan, {
       toValue: { x: -500, y: 0 },
     }).start((status) => {
@@ -407,6 +410,9 @@ export default class SwiperAnimated extends PureComponent {
   }
 
   forceRightSwipe = () => {
+    const { onRightSwipe } = this.props
+    const { card } = this.state
+    onRightSwipe(card)
     this.cardAnimation = Animated.timing(this.pan, {
       toValue: { x: 500, y: 0 },
     }).start((status) => {
