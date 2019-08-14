@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 import {
   StyleSheet,
   View,
@@ -10,8 +10,8 @@ import {
   BackHandler,
   TouchableOpacity,
   TouchableNativeFeedback
-} from 'react-native';
-import clamp from 'clamp';
+} from "react-native";
+import clamp from "clamp";
 
 const has = Object.prototype.hasOwnProperty;
 
@@ -19,35 +19,35 @@ let SWIPE_THRESHOLD = 120;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
+    flexDirection: "column",
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent"
   },
   card: {
-    flex: 1,
+    flex: 1
   },
   dot: {
     height: 5,
     width: 5,
     borderRadius: 5,
     marginLeft: 3,
-    marginRight: 3,
+    marginRight: 3
   },
   dotContainer: {
     height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   bottomPagination: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
-    bottom: 0,
-  },
+    bottom: 0
+  }
 });
 
-const { height: deviceHeight } = Dimensions.get('window');
+const { height: deviceHeight } = Dimensions.get("window");
 
 export default class SwiperAnimated extends PureComponent {
   static propTypes = {
@@ -60,6 +60,7 @@ export default class SwiperAnimated extends PureComponent {
     allowGestureTermination: PropTypes.bool,
     stack: PropTypes.bool,
     scaleOthers: PropTypes.bool,
+    scaleOthersFactor: PropTypes.number,
     stackOffsetY: PropTypes.number,
     stackDepth: PropTypes.number,
     onClick: PropTypes.func,
@@ -83,7 +84,7 @@ export default class SwiperAnimated extends PureComponent {
     renderPagination: PropTypes.func,
     onFinish: PropTypes.func,
     uuid: PropTypes.string,
-    swipeDirection: PropTypes.string,
+    swipeDirection: PropTypes.string
   };
 
   static defaultProps = {
@@ -95,6 +96,7 @@ export default class SwiperAnimated extends PureComponent {
     allowGestureTermination: false,
     stack: false,
     scaleOthers: true,
+    scaleOthersFactor: 0.075,
     stackOffsetY: 5,
     stackDepth: 5,
     onClick: () => {},
@@ -112,14 +114,14 @@ export default class SwiperAnimated extends PureComponent {
     onFirstBackPressed: () => {},
     renderHeader: () => {},
     showPagination: true,
-    paginationDotColor: '#C5C5C5',
-    paginationActiveDotColor: '#4D4D4E',
+    paginationDotColor: "#C5C5C5",
+    paginationActiveDotColor: "#4D4D4E",
     showPaginationBelow: false,
     hidePaginationOnLast: false,
     renderPagination: null,
     onFinish: () => {},
-    uuid: 'Y8sivEVkWc0p',
-    swipeDirection: 'right',
+    uuid: "Y8sivEVkWc0p",
+    swipeDirection: "right"
   };
 
   constructor(props) {
@@ -140,7 +142,7 @@ export default class SwiperAnimated extends PureComponent {
     this.textAnim = new Animated.Value(0.8);
 
     this.state = {
-      card: children[this.currentIndex[this.guid]],
+      card: children[this.currentIndex[this.guid]]
     };
 
     this.lastX = 0;
@@ -151,12 +153,14 @@ export default class SwiperAnimated extends PureComponent {
 
   componentWillMount() {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponderCapture: this.handleStartShouldSetPanResponder,
+      onStartShouldSetPanResponderCapture: this
+        .handleStartShouldSetPanResponder,
       onMoveShouldSetPanResponderCapture: this.handleMoveShouldSetPanResponder,
       onPanResponderGrant: this.handlePanResponderGrant,
-      onPanResponderTerminationRequest: () => this.props.allowGestureTermination,
+      onPanResponderTerminationRequest: () =>
+        this.props.allowGestureTermination,
       onPanResponderMove: this.handlePanResponderMove(),
-      onPanResponderRelease: this.handlePanResponderEnd,
+      onPanResponderRelease: this.handlePanResponderEnd
     });
   }
 
@@ -164,17 +168,24 @@ export default class SwiperAnimated extends PureComponent {
     this.isComponentMounted = true;
     this.animateEntrance();
 
-    if (Platform.OS === 'android' && this.props.backPressToBack) {
-      BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+    if (Platform.OS === "android" && this.props.backPressToBack) {
+      BackHandler.addEventListener("hardwareBackPress", this.handleBackPress);
     }
-    this.pan.x.addListener(({ value }) => { this.valueX = value; });
-    this.pan.y.addListener(({ value }) => { this.valueY = value; });
+    this.pan.x.addListener(({ value }) => {
+      this.valueX = value;
+    });
+    this.pan.y.addListener(({ value }) => {
+      this.valueY = value;
+    });
   }
 
   componentWillUnmount() {
     this.isComponentMounted = false;
-    if (Platform.OS === 'android' && this.props.backPressToBack) {
-      BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+    if (Platform.OS === "android" && this.props.backPressToBack) {
+      BackHandler.removeEventListener(
+        "hardwareBackPress",
+        this.handleBackPress
+      );
     }
     this.pan.x.removeAllListeners();
     this.pan.y.removeAllListeners();
@@ -186,19 +197,25 @@ export default class SwiperAnimated extends PureComponent {
     this.lastX = gestureState.moveX;
     this.lastY = gestureState.moveY;
     return false;
-  }
+  };
 
   handleMoveShouldSetPanResponder = (e, gestureState) =>
-  Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
+    Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
 
   handlePanResponderGrant = () => {
     this.pan.setOffset({ x: this.valueX, y: this.valueY });
     this.pan.setValue({ x: 0, y: 0 });
-  };e
+  };
+  e;
 
-  handlePanResponderMove = () => Animated.event([
-    null, { dx: this.pan.x, dy: this.props.dragY ? this.pan.y : new Animated.Value(0) },
-  ]);
+  handlePanResponderMove = () =>
+    Animated.event([
+      null,
+      {
+        dx: this.pan.x,
+        dy: this.props.dragY ? this.pan.y : new Animated.Value(0)
+      }
+    ]);
 
   handlePanResponderEnd = (e, { vx, vy, dx, dy }) => {
     const { card } = this.state;
@@ -212,7 +229,7 @@ export default class SwiperAnimated extends PureComponent {
       tapToNext,
       stack,
       dragDownToBack,
-      swipeDirection,
+      swipeDirection
     } = this.props;
 
     let velocity;
@@ -233,7 +250,7 @@ export default class SwiperAnimated extends PureComponent {
       velocityY = dy < 0 ? -6 : 6;
     }
 
-    if ((dx === 0) && (dy === 0)) {
+    if (dx === 0 && dy === 0) {
       onClick(card);
       if (tapToNext) this.advanceState(velocity, vy, true);
     }
@@ -248,10 +265,13 @@ export default class SwiperAnimated extends PureComponent {
     const panX = Math.abs(this.valueX);
     const panY = Math.abs(this.valueY);
 
-    if ((!isNaN(panY) && panX > SWIPE_THRESHOLD) || (!isNaN(panY) && panY > SWIPE_THRESHOLD)) {
+    if (
+      (!isNaN(panY) && panX > SWIPE_THRESHOLD) ||
+      (!isNaN(panY) && panY > SWIPE_THRESHOLD)
+    ) {
       if (stack) {
         // if stack, any direction removes card
-        if (this.valueX > 0 && swipeDirection === 'right') {
+        if (this.valueX > 0 && swipeDirection === "right") {
           onRightSwipe(card);
         } else {
           onLeftSwipe(card);
@@ -260,7 +280,7 @@ export default class SwiperAnimated extends PureComponent {
         return;
       }
 
-      if (this.valueX > 0 && swipeDirection === 'right') {
+      if (this.valueX > 0 && swipeDirection === "right") {
         onRightSwipe(card);
         this.advanceState(velocity, vy, true);
       } else {
@@ -273,18 +293,23 @@ export default class SwiperAnimated extends PureComponent {
     }
   };
 
-  handleDirection = (isNext) => {
-    if (!this.isComponentMounted) { return; }
+  handleDirection = isNext => {
+    if (!this.isComponentMounted) {
+      return;
+    }
 
     this.resetState();
 
     if (this.props.stack) {
-      if ((this.props.dragDownToBack || this.props.backPressToBack) && !isNext) {
+      if (
+        (this.props.dragDownToBack || this.props.backPressToBack) &&
+        !isNext
+      ) {
         if (this.currentIndex[this.guid] > 0) {
           this.currentIndex[this.guid] -= 1;
 
           this.setState({
-            card: this.props.children[this.currentIndex[this.guid]],
+            card: this.props.children[this.currentIndex[this.guid]]
           });
         }
       } else {
@@ -294,13 +319,13 @@ export default class SwiperAnimated extends PureComponent {
           this.currentIndex[this.guid] += 1;
 
           this.setState({
-            card: this.props.children[this.currentIndex[this.guid]],
+            card: this.props.children[this.currentIndex[this.guid]]
           });
         } else if (this.props.loop) {
           this.currentIndex[this.guid] = 0;
 
           this.setState({
-            card: this.props.children[0],
+            card: this.props.children[0]
           });
         } else {
           this.props.onFinish();
@@ -308,7 +333,7 @@ export default class SwiperAnimated extends PureComponent {
       }
     } else if (isNext) this.goToNextCard();
     else this.goToPrevCard();
-  }
+  };
 
   advanceState = (velocityX, vy, isNext, accumulatedX, velocityY) => {
     const { smoothTransition, stack } = this.props;
@@ -316,15 +341,17 @@ export default class SwiperAnimated extends PureComponent {
     if (smoothTransition) {
       this.handleDirection(isNext);
     } else {
-      const velocity = accumulatedX < SWIPE_THRESHOLD ?
-        { x: 0, y: velocityY } : { x: velocityX, y: vy };
+      const velocity =
+        accumulatedX < SWIPE_THRESHOLD
+          ? { x: 0, y: velocityY }
+          : { x: velocityX, y: vy };
 
       this.cardAnimation = Animated.decay(this.pan, {
         velocity,
-        deceleration: stack ? 0.99 : 0.986,
+        deceleration: stack ? 0.99 : 0.986
       });
 
-      this.cardAnimation.start((status) => {
+      this.cardAnimation.start(status => {
         if (status.finished) {
           this.handleDirection(isNext);
         } else this.resetState();
@@ -332,27 +359,27 @@ export default class SwiperAnimated extends PureComponent {
         this.cardAnimation = null;
       });
     }
-  }
+  };
 
   goToNextCard = () => {
     const total = this.props.children.length;
     if (this.currentIndex[this.guid] < total - 1) {
       this.currentIndex[this.guid] += 1;
       this.setState({
-        card: this.props.children[this.currentIndex[this.guid]],
+        card: this.props.children[this.currentIndex[this.guid]]
       });
     } else if (this.currentIndex[this.guid] === total - 1) {
       if (this.props.loop) {
         this.currentIndex[this.guid] = 0;
 
         this.setState({
-          card: this.props.children[this.currentIndex[this.guid]],
+          card: this.props.children[this.currentIndex[this.guid]]
         });
       } else {
         this.props.onFinish();
       }
     }
-  }
+  };
 
   goToPrevCard = () => {
     this.currentIndex[this.guid] -= 1;
@@ -362,28 +389,22 @@ export default class SwiperAnimated extends PureComponent {
     }
 
     this.setState({
-      card: this.props.children[this.currentIndex[this.guid]],
+      card: this.props.children[this.currentIndex[this.guid]]
     });
-  }
+  };
 
   animateEntrance = () => {
-    Animated.timing(
-      this.textAnim,
-      { toValue: 1 },
-    ).start();
+    Animated.timing(this.textAnim, { toValue: 1 }).start();
 
-    Animated.spring(
-      this.enter,
-      { toValue: 1, tension: 20 },
-    ).start();
-  }
+    Animated.spring(this.enter, { toValue: 1, tension: 20 }).start();
+  };
 
   resetPan = () => {
     Animated.spring(this.pan, {
       toValue: { x: 0, y: 0 },
-      friction: 4,
+      friction: 4
     }).start();
-  }
+  };
 
   resetState = () => {
     const { stack, smoothTransition } = this.props;
@@ -392,37 +413,37 @@ export default class SwiperAnimated extends PureComponent {
     this.enter.setValue(stack || smoothTransition ? 0.985 : 0.97);
     this.textAnim.setValue(0.8);
     this.animateEntrance();
-  }
+  };
 
   forceLeftSwipe = () => {
-    const { onLeftSwipe } = this.props
-    const { card } = this.state
-    onLeftSwipe(card, true)
+    const { onLeftSwipe } = this.props;
+    const { card } = this.state;
+    onLeftSwipe(card, true);
     this.cardAnimation = Animated.timing(this.pan, {
-      toValue: { x: -500, y: 0 },
-    }).start((status) => {
+      toValue: { x: -500, y: 0 }
+    }).start(status => {
       this.resetState();
       if (status.finished) this.handleDirection(false);
 
       this.cardAnimation = null;
     });
     this.props.onRemoveCard(this.currentIndex[this.guid]);
-  }
+  };
 
   forceRightSwipe = () => {
-    const { onRightSwipe } = this.props
-    const { card } = this.state
-    onRightSwipe(card, true)
+    const { onRightSwipe } = this.props;
+    const { card } = this.state;
+    onRightSwipe(card, true);
     this.cardAnimation = Animated.timing(this.pan, {
-      toValue: { x: 500, y: 0 },
-    }).start((status) => {
+      toValue: { x: 500, y: 0 }
+    }).start(status => {
       this.resetState();
       if (status.finished) this.handleDirection(true);
 
       this.cardAnimation = null;
     });
     this.props.onRemoveCard(this.currentIndex[this.guid]);
-  }
+  };
 
   handleBackPress = () => {
     if (this.currentIndex[this.guid] === 0) {
@@ -432,75 +453,98 @@ export default class SwiperAnimated extends PureComponent {
     }
 
     return true;
-  }
+  };
 
   calcOffsetY = (index, y) => y * index;
 
-  calcScale = reversedIndex => 1 - ((reversedIndex) * 0.005);
+  calcScale = reversedIndex => 1 - reversedIndex * this.props.scaleOthersFactor;
 
-  jumpToIndex = (index) => {
+  jumpToIndex = index => {
     this.currentIndex[this.guid] = index;
 
     this.setState({
-      card: this.props.children[this.currentIndex[this.guid]],
+      card: this.props.children[this.currentIndex[this.guid]]
     });
-  }
+  };
 
   renderPagination = () => {
     const total = this.props.children.length;
     const index = this.currentIndex[this.guid];
-    const { paginationDotColor, paginationActiveDotColor,
-      showPaginationBelow, renderPagination, stack, hidePaginationOnLast } = this.props;
+    const {
+      paginationDotColor,
+      paginationActiveDotColor,
+      showPaginationBelow,
+      renderPagination,
+      stack,
+      hidePaginationOnLast
+    } = this.props;
 
     if (renderPagination) {
       return (
         <View
-          style={[showPaginationBelow && styles.bottomPagination,
+          style={[
+            showPaginationBelow && styles.bottomPagination,
             !stack && { zIndex: 1000 },
-            (hidePaginationOnLast && total - 1 === index) && { opacity: 0 },
-          ]}
-        >
+            hidePaginationOnLast && total - 1 === index && { opacity: 0 }
+          ]}>
           {renderPagination(total, index)}
-        </View>);
+        </View>
+      );
     }
 
     const dots = [];
     for (let i = 0; i < total; i += 1) {
-      const Touchable = Platform.OS === "android" ? TouchableNativeFeedback: TouchableOpacity
+      const Touchable =
+        Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
       dots.push(
         <Touchable
           hitSlop={{ top: 10, left: 10, bottom: 10, right: 10 }}
           key={i}
-          onPress={() => this.jumpToIndex(i)}
-        >
+          onPress={() => this.jumpToIndex(i)}>
           <View
-            style={[styles.dot, { backgroundColor: paginationDotColor || '#C5C5C5' },
-              index >= i ? { backgroundColor: paginationActiveDotColor || '#4D4D4E' } : null]}
+            style={[
+              styles.dot,
+              { backgroundColor: paginationDotColor || "#C5C5C5" },
+              index >= i
+                ? { backgroundColor: paginationActiveDotColor || "#4D4D4E" }
+                : null
+            ]}
           />
-        </Touchable>,
+        </Touchable>
       );
     }
 
     return (
       <View
-        style={[styles.dotContainer,
+        style={[
+          styles.dotContainer,
           showPaginationBelow && styles.bottomPagination,
           !stack && { zIndex: 1000 },
-          (hidePaginationOnLast && total - 1 === index) && { opacity: 0 },
-        ]}
-      >
+          hidePaginationOnLast && total - 1 === index && { opacity: 0 }
+        ]}>
         {dots}
-      </View>);
-  }
+      </View>
+    );
+  };
 
   /**
    * Renders the cards as a stack with props.stackDepth cards deep.
    */
   renderStack = () => {
-    const { swiper, stackOffsetY: offsetY, stackDepth, scaleOthers, swipeThroughStack, children } = this.props;
+    const {
+      swiper,
+      stackOffsetY: offsetY,
+      stackDepth,
+      scaleOthers,
+      swipeThroughStack,
+      children
+    } = this.props;
 
     const reversedCards = children
-      .slice(this.currentIndex[this.guid], this.currentIndex[this.guid] + stackDepth)
+      .slice(
+        this.currentIndex[this.guid],
+        this.currentIndex[this.guid] + stackDepth
+      )
       .reverse();
 
     const count = reversedCards.length;
@@ -515,7 +559,7 @@ export default class SwiperAnimated extends PureComponent {
 
       let translateY = 0;
       let translateX = 0;
-      let rotate = '0deg';
+      let rotate = "0deg";
       let panHandlers = {};
       let scaleX = 1;
       let opacity = 1;
@@ -532,26 +576,38 @@ export default class SwiperAnimated extends PureComponent {
         translateY = Animated.add(this.pan.y, this.pan.x).interpolate({
           inputRange: [-120, 0, 120],
           outputRange: [cardOffsetYEnd, lastOffsetY, cardOffsetYEnd],
-          extrapolate: 'clamp',
+          extrapolate: "clamp"
         });
         scaleX = Animated.add(this.pan.y, this.pan.x).interpolate({
           inputRange: [-120, 0, 120],
           outputRange: [cardScaleEnd, cardScaleX, cardScaleEnd],
-          extrapolate: 'clamp',
+          extrapolate: "clamp"
         });
-        opacity = this.enter.interpolate({ inputRange: [0.6, 1], outputRange: [0.8, 1] });
+        opacity = this.enter.interpolate({
+          inputRange: [0.6, 1],
+          outputRange: [0.8, 1]
+        });
       } else if (i === count - 1) {
         /* ===============================================================================
          first card!
          add panHandlers and other transforms
          =============================================================================== */
-        rotate = this.pan.x.interpolate({ inputRange: [-400, 0, 400], outputRange: ['-8deg', '0deg', '8deg'] });
+        rotate = this.pan.x.interpolate({
+          inputRange: [-400, 0, 400],
+          outputRange: ["-8deg", "0deg", "8deg"]
+        });
         translateY = this.pan.y;
         translateX = this.pan.x;
-        panHandlers = (swiper && children.length - 1 !== this.currentIndex[this.guid]) || swipeThroughStack ?
-          this.panResponder.panHandlers : {};
+        panHandlers =
+          (swiper && children.length - 1 !== this.currentIndex[this.guid]) ||
+          swipeThroughStack
+            ? this.panResponder.panHandlers
+            : {};
         if (this.pan.y === 0 && this.pan.x === 0) {
-          translateY = this.enter.interpolate({ inputRange: [0.5, 1], outputRange: [5, 50] });
+          translateY = this.enter.interpolate({
+            inputRange: [0.5, 1],
+            outputRange: [5, 50]
+          });
         }
       } else {
         /* ===============================================================================
@@ -560,21 +616,27 @@ export default class SwiperAnimated extends PureComponent {
         translateY = Animated.add(this.pan.y, this.pan.x).interpolate({
           inputRange: [-120, 0, 120],
           outputRange: [cardOffsetYEnd, cardOffsetY, cardOffsetYEnd],
-          extrapolate: 'clamp',
+          extrapolate: "clamp"
         });
         scaleX = Animated.add(this.pan.y, this.pan.x).interpolate({
           inputRange: [-120, 0, 120],
           outputRange: [cardScaleEnd, cardScaleX, cardScaleEnd],
-          extrapolate: 'clamp',
+          extrapolate: "clamp"
         });
-        opacity = this.enter.interpolate({ inputRange: [0.6, 1], outputRange: [0.9, 1] });
+        opacity = this.enter.interpolate({
+          inputRange: [0.6, 1],
+          outputRange: [0.9, 1]
+        });
         if (this.pan.y === 0) {
-          translateY = this.enter.interpolate({ inputRange: [0.5, 1], outputRange: [0, 30] });
+          translateY = this.enter.interpolate({
+            inputRange: [0.5, 1],
+            outputRange: [0, 30]
+          });
         }
       }
 
       const animatedCardStyles = {
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
@@ -586,56 +648,61 @@ export default class SwiperAnimated extends PureComponent {
           { rotate },
           { translateX },
           { scaleX: scaleOthers ? scaleX : 1 },
-          { scaleY },
-        ],
+          { scaleY }
+        ]
       };
 
       return (
         <Animated.View
-          key={has.call(card, 'key') && card.key ? card.key : i}
+          key={has.call(card, "key") && card.key ? card.key : i}
           style={animatedCardStyles}
-          {...panHandlers}
-        >
+          {...panHandlers}>
           {card}
-        </Animated.View>);
+        </Animated.View>
+      );
     });
 
-    return (
-      <View>
-        {cardStack}
-      </View>
-    );
-  }
+    return <View>{cardStack}</View>;
+  };
 
   renderCard = () => {
     const { swiper, renderCard, smoothTransition } = this.props;
     const [translateX, translateY] = [this.pan.x, this.pan.y];
 
-    const rotate = this.pan.x.interpolate({ inputRange: [-200, 0, 200], outputRange: ['-30deg', '0deg', '30deg'] });
-    const opacity = smoothTransition ?
-      1 : this.pan.x.interpolate({ inputRange: [-200, 0, 200], outputRange: [0.5, 1, 0.5] });
+    const rotate = this.pan.x.interpolate({
+      inputRange: [-200, 0, 200],
+      outputRange: ["-30deg", "0deg", "30deg"]
+    });
+    const opacity = smoothTransition
+      ? 1
+      : this.pan.x.interpolate({
+          inputRange: [-200, 0, 200],
+          outputRange: [0.5, 1, 0.5]
+        });
 
     const scale = this.enter;
 
     const animatedCardStyles = {
       transform: [{ translateX }, { translateY }, { rotate }, { scale }],
-      opacity,
+      opacity
     };
 
     const handler = swiper ? this.panResponder.panHandlers : {};
 
     return (
-      <Animated.View
-        style={[styles.card, animatedCardStyles]}
-        {...handler}
-      >
+      <Animated.View style={[styles.card, animatedCardStyles]} {...handler}>
         {renderCard ? renderCard(this.state.card) : this.state.card}
       </Animated.View>
     );
-  }
+  };
 
   render() {
-    const { stack, renderHeader, style: propStyle, showPagination } = this.props;
+    const {
+      stack,
+      renderHeader,
+      style: propStyle,
+      showPagination
+    } = this.props;
 
     return (
       <View style={[styles.container, propStyle]}>
